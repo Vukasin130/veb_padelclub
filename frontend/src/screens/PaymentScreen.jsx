@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Col } from 'react-bootstrap';
@@ -13,13 +13,16 @@ const PaymentScreen = () => {
     const navigate = useNavigate();
 
     const cart = useSelector((state) => state.cart);
-    const { shippingAddress } = cart;
+    const reservationContact = useMemo(
+        () => cart.reservationContact || cart.shippingAddress || {},
+        [cart.reservationContact, cart.shippingAddress]
+    );
 
     useEffect(() => {
-        if (!shippingAddress?.address) {
+        if (!reservationContact?.name && !reservationContact?.address) {
             navigate('/shipping');
         }
-    }, [shippingAddress, navigate]);
+    }, [reservationContact, navigate]);
 
     const submitHandler = (e) => {
         e.preventDefault();

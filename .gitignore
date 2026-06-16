@@ -25,4 +25,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 dev-server*.log
+backend-server*.log
+backend-api-test*.log
+backend-node*.log
+frontend-server*.log
 frontend/dev-server*.log

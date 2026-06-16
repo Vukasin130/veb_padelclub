@@ -3,25 +3,26 @@ import { Form, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import FormContainer from '../components/FormContainer';
-import { saveShippingAddress } from '../slices/cartSlice';
+import { saveReservationContact } from '../slices/cartSlice';
 import CheckoutSteps from '../components/CheckoutSteps';
 
 
 const ShippingScreen = () => {
     const cart = useSelector((state) => state.cart);
-    const { shippingAddress } = cart;
+    const { userInfo } = useSelector((state) => state.auth);
+    const reservationContact = cart.reservationContact || cart.shippingAddress || {};
 
-    const [address, setAddress] = useState(shippingAddress?.address || '');
-    const [city, setCity] = useState(shippingAddress?.city || '');
-    const [postalCode, setPostalCode] = useState(shippingAddress?.postalCode || '');
-    const [country, setCountry] = useState(shippingAddress?.country || '');
+    const [name, setName] = useState(reservationContact?.name || reservationContact?.address || userInfo?.name || '');
+    const [email, setEmail] = useState(reservationContact?.email || reservationContact?.city || userInfo?.email || '');
+    const [phone, setPhone] = useState(reservationContact?.phone || reservationContact?.postalCode || '');
+    const [note, setNote] = useState(reservationContact?.note || reservationContact?.country || '');
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const submitHandler = (e) => {
         e.preventDefault();
-        dispatch(saveShippingAddress({ address, city, postalCode, country }));
+        dispatch(saveReservationContact({ name, email, phone, note }));
         navigate('/payment');
     };
 
@@ -31,44 +32,43 @@ const ShippingScreen = () => {
             <h1>Kontakt podaci</h1>
 
             <Form onSubmit={submitHandler}>
-                <Form.Group controlId='address' className='my-2'>
+                <Form.Group controlId='name' className='my-2'>
                     <Form.Label>Ime i prezime</Form.Label>
                     <Form.Control
                         type='text'
                         placeholder='Unesite ime i prezime'
-                        value={address}
+                        value={name}
                         required
-                        onChange={(e) => setAddress(e.target.value)}
+                        onChange={(e) => setName(e.target.value)}
                     ></Form.Control>
                 </Form.Group>
-                <Form.Group controlId='city' className='my-2'>
+                <Form.Group controlId='email' className='my-2'>
                     <Form.Label>Email</Form.Label>
                     <Form.Control
                         type='email'
                         placeholder='Unesite email adresu'
-                        value={city}
+                        value={email}
                         required
-                        onChange={(e) => setCity(e.target.value)}
+                        onChange={(e) => setEmail(e.target.value)}
                     ></Form.Control>
                 </Form.Group>
-                <Form.Group controlId='postalCode' className='my-2'>
+                <Form.Group controlId='phone' className='my-2'>
                     <Form.Label>Kontakt telefon</Form.Label>
                     <Form.Control
                         type='text'
                         placeholder='Unesite broj telefona'
-                        value={postalCode}
+                        value={phone}
                         required
-                        onChange={(e) => setPostalCode(e.target.value)}
+                        onChange={(e) => setPhone(e.target.value)}
                     ></Form.Control>
                 </Form.Group>
-                <Form.Group controlId='country' className='my-2'>
+                <Form.Group controlId='note' className='my-2'>
                     <Form.Label>Napomena</Form.Label>
                     <Form.Control
                         type='text'
                         placeholder='Broj igraca ili posebna napomena'
-                        value={country}
-                        required
-                        onChange={(e) => setCountry(e.target.value)}
+                        value={note}
+                        onChange={(e) => setNote(e.target.value)}
                     ></Form.Control>
                 </Form.Group>
 

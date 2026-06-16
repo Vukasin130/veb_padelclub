@@ -19,6 +19,16 @@ import CartScreen from './screens/CartScreen';
 import ShippingScreen from './screens/ShippingScreen';
 import PaymentScreen from './screens/PaymentScreen';
 import PlaceOrderScreen from './screens/PlaceOrderScreen';
+import LoginScreen from './screens/LoginScreen';
+import RegisterScreen from './screens/RegisterScreen';
+import AdminScreen from './screens/AdminScreen';
+import ProfileScreen from './screens/ProfileScreen';
+import ReservationScreen from './screens/ReservationScreen';
+import ReservationListScreen from './screens/admin/ReservationListScreen';
+import SlotListScreen from './screens/admin/SlotListScreen';
+import ProductListScreen from './screens/admin/ProductListScreen';
+import PrivateRoute from './components/PrivateRoute';
+import AdminRoute from './components/AdminRoute';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -26,9 +36,21 @@ const router = createBrowserRouter(
       <Route index={true} path="/" element={<HomeScreen />} />
       <Route path="/product/:id" element={<ProductScreen />} />
       <Route path='/cart' element={<CartScreen />} />
-      <Route path='/shipping' element={<ShippingScreen />} />
-      <Route path='/payment' element={<PaymentScreen />} />
-      <Route path='/placeorder' element={<PlaceOrderScreen />} />
+      <Route path='/login' element={<LoginScreen />} />
+      <Route path='/register' element={<RegisterScreen />} />
+      <Route path='' element={<PrivateRoute />}>
+        <Route path='/shipping' element={<ShippingScreen />} />
+        <Route path='/payment' element={<PaymentScreen />} />
+        <Route path='/placeorder' element={<PlaceOrderScreen />} />
+        <Route path='/reservation/:id' element={<ReservationScreen />} />
+        <Route path='/profile' element={<ProfileScreen />} />
+      </Route>
+      <Route path='' element={<AdminRoute />}>
+        <Route path='/admin' element={<AdminScreen />} />
+        <Route path='/admin/reservationlist' element={<ReservationListScreen />} />
+        <Route path='/admin/slotlist' element={<SlotListScreen />} />
+        <Route path='/admin/productlist' element={<ProductListScreen />} />
+      </Route>
     </Route>
   )
 );

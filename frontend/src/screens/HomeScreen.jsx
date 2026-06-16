@@ -1,15 +1,17 @@
 import { Row, Col } from 'react-bootstrap'
 import Product from '../components/Product'
-import { getProducts } from '../services/catalogService'
+import Loader from '../components/Loader'
+import Message from '../components/Message'
+import { useGetProductsQuery } from '../slices/productApiSlice'
 const HomeScreen = () => {
-    const products = getProducts();
+    const { data: products, isLoading, error } = useGetProductsQuery();
 
     return (
         <>
             <section className="home-hero">
                 <div className="hero-copy">
                     <span className="hero-kicker">Novi Sad padel rezervacije</span>
-                    <h1>Rezervisi teren, trening ili opremu za sledeci mec.</h1>
+                    <h1>Rezervisi teren, trening ili opremu za sledeci mec</h1>
                     <p>
                         Pregledaj dostupnu ponudu kluba i slozi rezervaciju bez cekanja na poziv.
                     </p>
@@ -38,13 +40,19 @@ const HomeScreen = () => {
                 <p>Tereni, treninzi, oprema i clanarine na jednom mestu.</p>
             </div>
 
-            <Row className="g-4">
-                {products.map((product) => (
-                    <Col key={product._id} sm={12} md={6} lg={4}>
-                        <Product product={product} />
-                    </Col>
-                ))}
-            </Row>
+            {isLoading ? (
+                <Loader />
+            ) : error ? (
+                <Message variant='danger'>{error?.data?.message || error.error}</Message>
+            ) : (
+                <Row className="g-4">
+                    {products.map((product) => (
+                        <Col key={product._id} sm={12} md={6} lg={4}>
+                            <Product product={product} />
+                        </Col>
+                    ))}
+                </Row>
+            )}
         </>
     )
 }

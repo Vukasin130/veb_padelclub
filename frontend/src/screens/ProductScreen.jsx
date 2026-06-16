@@ -3,9 +3,10 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { Form, Row, Col, Image, Card, Button, Badge } from 'react-bootstrap'
 import Rating from '../components/Rating'
 import Message from '../components/Message'
-import { getProductById } from '../services/catalogService'
+import Loader from '../components/Loader'
 import { addToCart } from '../slices/cartSlice'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { useGetProductDetailsQuery } from '../slices/productApiSlice'
 
 const ProductScreen = () => {
     const { id: productId } = useParams();
@@ -14,14 +15,20 @@ const ProductScreen = () => {
     const [selectedSlot, setSelectedSlot] = useState(null);
     const [includeRacket, setIncludeRacket] = useState(false);
     const dispatch = useDispatch();
+    const { userInfo } = useSelector((state) => state.auth);
     const navigate = useNavigate();
-    const product = getProductById(productId);
-    const hasSlotPicker = Boolean(product?.availableSlots);
+    const { data: product, isLoading, error } = useGetProductDetailsQuery(productId);
+    const hasSlotPicker = Boolean(product?.availableSlots?.length);
     const activeDay = hasSlotPicker ? product.availableSlots[selectedDayIndex] : null;
     const racketPrice = includeRacket ? 500 : 0;
     const displayPrice = (selectedSlot?.price || product?.price || 0) + racketPrice;
 
     const addToCartHandler = () => {
+        if (!userInfo) {
+            navigate(`/login?redirect=/product/${productId}`);
+            return;
+        }
+
         if (hasSlotPicker && !selectedSlot) {
             return;
         }
@@ -31,6 +38,8 @@ const ProductScreen = () => {
                 ...product,
                 _id: `${product._id}-${selectedSlot.id}`,
                 productId: product._id,
+                product: product._id,
+                slot: selectedSlot._id || selectedSlot.id,
                 name: `${product.name} - ${selectedSlot.date} u ${selectedSlot.time}`,
                 price: selectedSlot.price + racketPrice,
                 qty: 1,
@@ -38,7 +47,7 @@ const ProductScreen = () => {
                 selectedSlot,
                 addOns: includeRacket ? [{ name: 'Iznajmljivanje reketa', price: 500 }] : [],
             }
-            : { ...product, qty };
+            : { ...product, product: product._id, qty };
 
         dispatch(addToCart(reservationItem));
         navigate('/cart');
@@ -48,7 +57,11 @@ const ProductScreen = () => {
         <Link className='btn btn-outline-secondary mb-4' to='/'>
             Nazad
         </Link>
-        {!product ? (
+        {isLoading ? (
+            <Loader />
+        ) : error ? (
+            <Message variant="danger">{error?.data?.message || error.error}</Message>
+        ) : !product ? (
             <Message variant="danger">Ponuda nije pronadjena</Message>
         ) : (
             <><Card className='detail-summary p-4 mb-4'>
@@ -207,7 +220,7 @@ const ProductScreen = () => {
                                         disabled={product.countInStock === 0 || (hasSlotPicker && !selectedSlot)}
                                         onClick={addToCartHandler}
                                     >
-                                        Dodaj u rezervacije
+                                        {userInfo ? 'Dodaj u rezervacije' : 'Prijavi se za rezervaciju'}
                                     </Button>
                                 </div>
                             </Card.Body>

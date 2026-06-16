@@ -440,6 +440,48 @@ main {
   font-weight: 800;
 }
 
+.admin-heading {
+  margin-bottom: 24px;
+}
+
+.admin-panel {
+  background: #fff;
+  border: 1px solid #dfe7d8;
+  border-radius: 8px;
+  box-shadow: 0 12px 26px rgba(16, 35, 31, 0.08);
+}
+
+.admin-panel h4 {
+  color: #10231f;
+  font-weight: 800;
+}
+
+.admin-table td,
+.admin-table th {
+  vertical-align: middle;
+}
+
+.admin-reservation-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+}
+
+.admin-reservation-row span,
+.admin-reservation-row small {
+  display: block;
+  color: #5f7768;
+  font-weight: 700;
+}
+
+.admin-reservation-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  white-space: nowrap;
+}
+
 table td,
 table th {
   text-align: center;
@@ -481,6 +523,14 @@ table th {
   .day-tabs,
   .slot-grid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .admin-reservation-row {
+    display: block;
+  }
+
+  .admin-reservation-actions {
+    margin-top: 12px;
   }
 }
 
