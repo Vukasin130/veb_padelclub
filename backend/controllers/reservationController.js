@@ -1,6 +1,23 @@
 import asyncHandler from 'express-async-handler';
+import mongoose from 'mongoose';
+import Product from '../models/productModel.js';
 import Reservation from '../models/reservationModel.js';
 import Slot from '../models/slotModel.js';
+
+const resolveReservationProductId = async (item) => {
+  if (mongoose.Types.ObjectId.isValid(item.product)) {
+    return item.product;
+  }
+
+  const baseName = item.name.split(' - ')[0];
+  const product = await Product.findOne({ name: baseName }).select('_id');
+
+  if (!product) {
+    throw new Error(`Ponuda nije pronadjena za stavku: ${item.name}`);
+  }
+
+  return product._id;
+};
 
 const addReservationItems = asyncHandler(async (req, res) => {
   const {
@@ -17,6 +34,14 @@ const addReservationItems = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error('Nema stavki za rezervaciju');
   }
+
+  const normalizedReservationItems = await Promise.all(
+    reservationItems.map(async (item) => ({
+      ...item,
+      product: await resolveReservationProductId(item),
+      slot: item.slot || undefined,
+    }))
+  );
 
   const requestedSlotIds = reservationItems
     .filter((item) => item.slot)
@@ -45,11 +70,7 @@ const addReservationItems = asyncHandler(async (req, res) => {
   }
 
   const reservation = new Reservation({
-    reservationItems: reservationItems.map((item) => ({
-      ...item,
-      product: item.product,
-      slot: item.slot || undefined,
-    })),
+    reservationItems: normalizedReservationItems,
     user: req.user._id,
     reservationDetails,
     paymentMethod,
